@@ -1,16 +1,16 @@
-#Minimum number of color for dsjc125.1.col is : 6
-#Minimum number of color for dsjc125.5.col is : 22
-#Minimum number of color for dsjc125.9.col is : 51
-#Minimum number of color for dsjc250.1.col is : 10
-#Minimum number of color for dsjc250.5.col is : 37
-#Minimum number of color for dsjc250.9.col is : 92
-#Minimum number of color for dsjc256.1.col is : 23
-#Minimum number of color for dsjc500.1.col is : 16
-#Minimum number of color for dsjc500.5.col is : 65
-#Minimum number of color for dsjc500.9.col is : 170
-#Minimum number of color for dsjc1000.1.col is : 27
-#Minimum number of color for dsjc1000.5.col is : 115
-#Minimum number of color for dsjc1000.9.col is : 299
-#--- 2094.3220422267914 seconds ---
+#Minimum number of color for dsjc125.1.col is : 6    ==> Checker : 6
+#Minimum number of color for dsjc125.5.col is : 22   ==> Checker : 22
+#Minimum number of color for dsjc125.9.col is : 51   ==> Checker : 51
+#Minimum number of color for dsjc250.1.col is : 10   ==> Checker : 10
+#Minimum number of color for dsjc250.5.col is : 37   ==> Checker : 37
+#Minimum number of color for dsjc250.9.col is : 92   ==> Checker : 92
+#Minimum number of color for dsjc256.1.col is : 23   ==> Checker : 23
+#Minimum number of color for dsjc500.1.col is : 16   ==> Checker : 16
+#Minimum number of color for dsjc500.5.col is : 65   ==> Checker : 65
+#Minimum number of color for dsjc500.9.col is : 170  ==> Checker : 170
+#Minimum number of color for dsjc1000.1.col is : 27  ==> Checker : 27
+#Minimum number of color for dsjc1000.5.col is : 115 ==> Checker : 115
+#Minimum number of color for dsjc1000.9.col is : 299 ==> Checker : 299
+
 
 
