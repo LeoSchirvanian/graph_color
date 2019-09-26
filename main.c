@@ -115,7 +115,7 @@ void clone(int nb_to_clone)
 	}
 	
 	// on garde les indices des 'nb_to_clone' meilleurs individus 
-	int memory[nb_to_clone];
+	int memory[nb_to_clone][nb_sommets];
 	int pointer=0;
 	
 	for(int i=0; i < nb_to_clone; i++)
@@ -128,14 +128,18 @@ void clone(int nb_to_clone)
 			if(liste_conflit[j] <= temp) 
 			{
 				temp = liste_conflit[j];			
-				best_index = j;				
-				
+				best_index = j;						
 			}
 		}
-		memory[pointer] = best_index;
+		// ajoute les meilleurs individus à la memoire
+		for(int j=0; j < nb_sommets; j++)
+		{
+			memory[pointer][j] = population[best_index][j];
+		}
 		pointer++;
-		liste_conflit[memory[pointer-1]] = nb_sommets+1;
-	} 
+		// on sature la valeur de conflit pour les indiv déjà ajoutés pour ne plus les prendre en compte
+		liste_conflit[best_index] = nb_sommets+1;
+	}
 
 /* 	printf("\n");
 	for(int i = 0; i<taille_population; i++)
@@ -148,18 +152,33 @@ void clone(int nb_to_clone)
 		printf("%d ", memory[i]);
 	}
 	printf("\n");
-	/* for(int i = 0; i<taille_population; i++)
+	for(int i = 0; i<nb_to_clone; i++)
 	{
 		for(int j = 0; j<nb_sommets; j++)
 		{
-			printf("%d ", population[i][j]);
+			printf("%d ", memory[i][j]);
 		}
 		printf("\n");
 	} */
 
-	// on clone les meilleurs individus
+	// on clone les meilleurs individus dans population
 	
-	
+	pointer = 0;
+	for(int i=0; i < taille_population; i++)
+	{
+		for(int j=0; j < nb_sommets; j++)
+		{
+			if(pointer < nb_to_clone) 
+			{
+				population[i][j] = memory[pointer][j];
+			}
+		}
+		pointer++;
+		if(pointer >= nb_to_clone) 
+			{
+				pointer = 0;
+			}
+	}
 }
 
 
@@ -168,30 +187,25 @@ void clone(int nb_to_clone)
 
 //======================================================================
 
-int main(int argc, char* args[]) {
-    if(argc>=1){
+int main(int argc, char* args[]) 
+{
+    if(argc>=1)
+	{
     	// read input file and create graph
-        if(lireDonnee(args[1])){
+        if(lireDonnee(args[1]))
+		{
         //_____________génétique__________________
         	
-        	createPopulation(4, 5);
+        	createPopulation(100, 5);
         	
         	clone(2);
             
             return 1;
         }
-    }else{
+    }
+	else
+	{
         printf("Vous devez donner un fichier en argument !\n");
         return 0;
     }
-/* 	for(int i=0; i < nb_sommets; i++)
-	{
-		free(graph[i]);
-	}
-	free(graph);
-	for(int i=0; i < taille_population; i++)
-	{
-		free(population[i]);
-	}
-	free(population); */
 }
