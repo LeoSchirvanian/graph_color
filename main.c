@@ -50,12 +50,12 @@ void affiche(){
 }
 
 
-void enregistre(char* chemin){
+void enregistre(char* chemin, int best_indiv){
     FILE* fichier = NULL;
     fichier = fopen(chemin, "w");
      if (fichier != NULL)
     {
-        for(int i = 0;i<nb_sommets;i++) fprintf(fichier,"%d\n",couleurs[i]);
+        for(int i = 0;i<nb_sommets;i++) fprintf(fichier,"%d\n",population[best_indiv][i]);
         fclose(fichier);
     }   
 }
@@ -91,10 +91,13 @@ void createPopulation(int max_color, int nb_individu)
 //Fonction qui check si les sommets d'un individu ne possèdent pas des voisins de même couleur
 int check_node(int i, int indiv){
     for(int j = 0; j<nb_sommets; j++){
-        if(graph[i][j]==1 && population[indiv][i] == population[indiv][j])
+        if(graph[i][j]==1)
         {
+			if( population[indiv][i] == population[indiv][j])
+			{
+				return 0;
+			}
             //printf("Conflit : Sommet n°%d (couleur : %d) <-> Sommet n°%d (couleur %d)\n",i,population[indiv][i],j,population[indiv][j]);
-            return 0;
         }
     }
     return 1;
@@ -103,10 +106,21 @@ int check_node(int i, int indiv){
 //Calcule le nombre d'erreurs pour un individu donné
 int check_solution(int indiv){
     int errors = 0;
-    for(int i = 0; i<nb_sommets; i++) if(!check_node(i, indiv)) errors++;
+    for(int i = 0; i<nb_sommets; i++) if(check_node(i, indiv)==0) errors++;
     return errors;
 }
 
+
+int get_color(int indiv){
+	// renvoie la plus grande couleur de l'individu
+	int max = 0;
+	for(int i =0; i<nb_sommets; i++){
+		if(population[indiv][i] > max){
+			max = population[indiv][i];
+		}
+	}
+	return(max);
+}
 
 void clone(int nb_to_clone)
 {
@@ -126,15 +140,23 @@ void clone(int nb_to_clone)
 	for(int i=0; i < nb_to_clone; i++)
 	{
 		int temp = liste_conflit[0];
-		int best_index;
+		int best_index = 0;
+
 		
 		for(int j=0; j < taille_population; j++)
 		{	
-			if(liste_conflit[j] <= temp) 
+			if(liste_conflit[j] < temp) 
 			{
-				temp = liste_conflit[j];			
+				temp = liste_conflit[j];		
 				best_index = j;						
+			}			
+			if(liste_conflit[j] == temp){
+				if(get_color(j) <= get_color(best_index))
+				{
+					best_index = j;
+				}				
 			}
+			
 		}
 		// ajoute les meilleurs individus à la memoire
 		for(int j=0; j < nb_sommets; j++)
@@ -148,7 +170,15 @@ void clone(int nb_to_clone)
 
 /* 	printf("\n");
 	for(int i = 0; i<taille_population; i++)
-	{
+	{int get_color(int indiv){
+	int max = 0;
+	for(int i =0; i<nb_sommets; i++){
+		if(population[indiv][i] > max){
+			max = population[indiv][i];
+		}
+	}
+	return(max);
+}
 		printf("%d ", liste_conflit[i]);
 	} 
 	printf("\n");
@@ -180,52 +210,66 @@ void clone(int nb_to_clone)
 		}
 		pointer++;
 		if(pointer >= nb_to_clone) 
-			{
-				pointer = 0;
-			}
+		{
+			pointer = 0;
+		}
 	}
 }
 
-int get_color(int indiv){
-	int max = 0;
-	for(int i =0; i<nb_sommets; i++){
-		if(population[indiv][i] > max){
-			max = population[indiv][i];
-		}
-	}
-	return(max);
-}
+
 
 int evaluate(){
-	int best = 0;
+	// permet de récupérer le meilleur individu valide
+	int best = -1;
 	int color = nb_sommets+1;
 	for(int i = 0; i<taille_population; i++){
-		if( check_solution(population[i]) == 0){
-			if( get_color(population[i]) < color){
+		if( check_solution(i) == 0){
+			int temp = get_color(i);
+			if( temp < color){
 				best = i;
+				color = temp;
 			}
 		}
 	}
+	// affiche erreur si aucun individu valide
+	if(best == -1)
+	{
+		printf("\naucun résultat satisfaisant\n");
+		return 0;
+	}
 
-	for(int i = 0; i <taille_population; i++){
-		printf("%d",population[best][i]);
-	} 
+	for(int i = 0; i <nb_sommets; i++){
+		printf("%d  ",population[best][i]);
+	}
+	enregistre("/home/sebastien/Documents/Cours/ecole_des_mines/3A/IA/metaheuristic/TP_genetic/results/res1", best);
 }
 
 void mutate(float indiv_mutation_proba, float gene_mutation_proba)
 {
-	// Chaque individue à une probabilité de muter
+	// Chaque individue à une probabilité de muter mais on ne fait pas muter ceux qui sont valides
 	for(int i=0; i < taille_population; i++)
 	{
-		if(rand()/RAND_MAX <= indiv_mutation_proba)
+		if(rand()/RAND_MAX <= indiv_mutation_proba && check_solution(i) != 0)
 		{
 			// Si l'individue doit muter alors chaque gène à une proba de muter
 			for(int j=0; j< nb_sommets; j++)
 			{
 				if(rand()/RAND_MAX <= gene_mutation_proba)
 				{
-					// si le gène mute on lui donne un entier aléatoire entre 0 et nb_sommets
-					population[i][j] = (rand()/RAND_MAX) * nb_sommets;
+					/* quand le gène mute il a 50% de chance de switcher avec un gène au pif
+					et 50% diminuer sa couleur de x, x in [0, 10] */
+					if( rand() / (RAND_MAX/2)>0)
+					{
+						int temp0 = population[i][j];
+						int temp1 = rand() / (RAND_MAX/nb_sommets);
+						population[i][j] = population[i][temp1];
+						population[i][temp1] = temp0;
+					}else
+					{
+						int temp2 = rand() / (RAND_MAX/10);
+						if(population[i][j]-temp2 >= 0) population[i][j] -= temp2;
+					}				
+					//population[i][j] = population[i][j] - 1; 
 				}
 			}
 		}		
@@ -246,16 +290,16 @@ int main(int argc, char* args[]) {
     	// read input file and create graph
         if(lireDonnee(args[1]))
 		{
-        //_____________génétique__________________
+        //_____________génétique___and()/RAND_MAX) * nb_somm_______________
         	
-        	createPopulation(100, 1000);
+        	createPopulation(100, 100);
             
 			do{
 				start = clock();
 
-				clone(50);
+				clone(20);
 
-				mutate(0.05, 0.04);
+				mutate(0.4, 0.2);
 
 				end = clock();
         		cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
