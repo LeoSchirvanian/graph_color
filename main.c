@@ -8,7 +8,10 @@ int **graph;
 int **population;
 int *couleurs;
 
+#define TIME 60.0 //temps de calcul CPU
 
+
+//Fonction qui permet de lire les données en entrée
 int lireDonnee(char *chemin){
     FILE *f;
     f=fopen(chemin,"r"); // Ouverture du fichier
@@ -85,6 +88,7 @@ void createPopulation(int max_color, int nb_individu)
 	}
 }
 
+//Fonction qui check si les sommets d'un individu ne possèdent pas des voisins de même couleur
 int check_node(int i, int indiv){
     for(int j = 0; j<nb_sommets; j++){
         if(graph[i][j]==1 && population[indiv][i] == population[indiv][j])
@@ -96,6 +100,7 @@ int check_node(int i, int indiv){
     return 1;
 }
 
+//Calcule le nombre d'erreurs pour un individu donné
 int check_solution(int indiv){
     int errors = 0;
     for(int i = 0; i<nb_sommets; i++) if(!check_node(i, indiv)) errors++;
@@ -181,7 +186,31 @@ void clone(int nb_to_clone)
 	}
 }
 
+int get_color(int indiv){
+	int max = 0;
+	for(int i =0; i<nb_sommets; i++){
+		if(population[indiv][i] > max){
+			max = population[indiv][i]
+		}
+	}
+	return(max)
+}
 
+int evaluate(){
+	int best = 0;
+	int color = nb_sommets+1;
+	for(int i = 0; i<taille_population; i++){
+		if( check_solution(population[i]) == 0){
+			if( get_color(population[i]) < color){
+				best = i;
+			}
+		}
+	}
+
+	for(int i = 0; i <taille_population; i++){
+		printf("%d",population[best][i])
+	} 
+}
 
 
 
@@ -189,6 +218,11 @@ void clone(int nb_to_clone)
 
 int main(int argc, char* args[]) 
 {
+
+	//Calcul temps CPU
+    clock_t start, end;
+    double cpu_time_used = 0.0;
+
     if(argc>=1)
 	{
     	// read input file and create graph
@@ -200,8 +234,22 @@ int main(int argc, char* args[])
         	
         	clone(2);
             
-            return 1;
+
+			do{
+				start = clock();
+
+				//MUTATION & EVALUATION
+
+				end = clock();
+        		cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
+
+			}while( (cpu_time_used < TIME)
+
+			for(int i=0; i<taille_population; i++){
+				check_node(int indv, j)
+			}
         }
+		return 1;
     }
 	else
 	{
