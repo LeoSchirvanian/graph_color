@@ -182,7 +182,7 @@ void clone(int nb_to_clone)
 }
 
 
-void mutate(int indiv_mutation_proba, int gene_mutation_proba)
+void mutate(float indiv_mutation_proba, float gene_mutation_proba)
 {
 	// Chaque individue à une probabilité de muter
 	for(int i=0; i < taille_population; i++)
@@ -218,6 +218,8 @@ int main(int argc, char* args[])
         	createPopulation(100, 1000);
         	
         	clone(2);
+
+			mutate(0.05, 0.04);
             
             return 1;
         }
