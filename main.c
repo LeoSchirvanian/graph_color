@@ -182,6 +182,25 @@ void clone(int nb_to_clone)
 }
 
 
+void mutate(int indiv_mutation_proba, int gene_mutation_proba)
+{
+	// Chaque individue à une probabilité de muter
+	for(int i=0; i < taille_population; i++)
+	{
+		if(rand()/RAND_MAX <= indiv_mutation_proba)
+		{
+			// Si l'individue doit muter alors chaque gène à une proba de muter
+			for(int j=0; j< nb_sommets; j++)
+			{
+				if(rand()/RAND_MAX <= gene_mutation_proba)
+				{
+					// si le gène mute on lui donne un entier aléatoire entre 0 et nb_sommets
+					population[i][j] = (rand()/RAND_MAX) * nb_sommets;
+				}
+			}
+		}		
+	}
+}
 
 
 
@@ -196,7 +215,7 @@ int main(int argc, char* args[])
 		{
         //_____________génétique__________________
         	
-        	createPopulation(100, 5);
+        	createPopulation(100, 1000);
         	
         	clone(2);
             
