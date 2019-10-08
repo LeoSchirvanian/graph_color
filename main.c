@@ -190,10 +190,10 @@ int get_color(int indiv){
 	int max = 0;
 	for(int i =0; i<nb_sommets; i++){
 		if(population[indiv][i] > max){
-			max = population[indiv][i]
+			max = population[indiv][i];
 		}
 	}
-	return(max)
+	return(max);
 }
 
 int evaluate(){
@@ -208,16 +208,34 @@ int evaluate(){
 	}
 
 	for(int i = 0; i <taille_population; i++){
-		printf("%d",population[best][i])
+		printf("%d",population[best][i]);
 	} 
 }
 
+void mutate(float indiv_mutation_proba, float gene_mutation_proba)
+{
+	// Chaque individue à une probabilité de muter
+	for(int i=0; i < taille_population; i++)
+	{
+		if(rand()/RAND_MAX <= indiv_mutation_proba)
+		{
+			// Si l'individue doit muter alors chaque gène à une proba de muter
+			for(int j=0; j< nb_sommets; j++)
+			{
+				if(rand()/RAND_MAX <= gene_mutation_proba)
+				{
+					// si le gène mute on lui donne un entier aléatoire entre 0 et nb_sommets
+					population[i][j] = (rand()/RAND_MAX) * nb_sommets;
+				}
+			}
+		}		
+	}
+}
 
 
 //======================================================================
 
-int main(int argc, char* args[]) 
-{
+int main(int argc, char* args[]) {
 
 	//Calcul temps CPU
     clock_t start, end;
@@ -230,24 +248,21 @@ int main(int argc, char* args[])
 		{
         //_____________génétique__________________
         	
-        	createPopulation(100, 5);
-        	
-        	clone(2);
+        	createPopulation(100, 1000);
             
-
 			do{
 				start = clock();
 
-				//MUTATION & EVALUATION
+				clone(50);
+
+				mutate(0.05, 0.04);
 
 				end = clock();
         		cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
 
-			}while( (cpu_time_used < TIME)
+			}while( (cpu_time_used < TIME));
 
-			for(int i=0; i<taille_population; i++){
-				check_node(int indv, j)
-			}
+			evaluate();
         }
 		return 1;
     }
