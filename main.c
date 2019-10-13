@@ -8,6 +8,9 @@ int **graph;
 int **population;
 int *couleurs;
 
+int *DSAT;
+int *degre;
+
 #define TIME 60.0 //temps de calcul CPU
 
 
@@ -65,6 +68,66 @@ void enregistre(char* chemin, int best_indiv){
 
 
 //=================================================================
+
+void update_node(int i){ // Actualise le degre et DSAT d'un noeux :
+    int nb_voisins_colorie = 0, nb_voisins = 0;
+    for(int j = 0;j<nb_sommets;j++){
+        if(graph[i][j] == 1 && i!=j){
+            nb_voisins++;
+            if(couleurs[j]!=0) nb_voisins_colorie++;
+        }
+    }
+    degre[i] = nb_voisins;
+    if(nb_voisins_colorie==0) DSAT[i] = nb_voisins;
+    else DSAT[i] = nb_voisins_colorie;
+}
+
+void init_arrays(){ // Initialise les trois tableaux suivants :
+    couleurs = (int*) malloc(sizeof(int*)*nb_sommets);
+    DSAT = (int*) malloc(sizeof(int*)*nb_sommets);
+    degre = (int*) malloc(sizeof(int*)*nb_sommets);
+    for(int i = 0;i<nb_sommets;i++){
+        couleurs[i] = 0;
+        update_node(i);
+    }
+}
+
+void colorier(int indice){
+    int couleur = 0, instances; // Couleur que nous allons attribuer, Compteur de noeux ayant déja la même couleur
+    do{
+        couleur++;instances=0;
+        for(int i = 0;(i<nb_sommets && instances==0);i++) if(graph[indice][i] == 1 && couleur==couleurs[i]) instances++;
+    }while(instances!=0);
+    couleurs[indice] = couleur;
+}
+
+int choix(){ // Renvoi l'indice du noeu suivant à traiter
+    int indice_max = 0, max = 0;
+    for(int i = 0;i<nb_sommets;i++){
+        if(couleurs[i]==0){
+            if(DSAT[i]==max){
+                if(degre[i]>degre[indice_max]){
+                    max = DSAT[i];
+                    indice_max = i;
+                }
+            }else if(DSAT[i]>max){
+                max = DSAT[i];
+                indice_max = i;
+            }
+        }
+    }
+    return indice_max;
+}
+
+void DSAT(){
+	int indice;
+	for(int i = 0;i<nb_sommets;i++){
+		indice = choix();
+        	colorier(indice);
+        	update_node(indice);
+	}
+}
+
 
 
 void createPopulation(int max_color, int nb_individu)
